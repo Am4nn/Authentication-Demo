@@ -5,70 +5,109 @@
 #define For(i, a, n) for (size_t i = a; i < n; i++)
 using namespace std;
 
-unordered_map<string, size_t> data1;
-std::hash<std::string> myHash;
+unordered_map<string, size_t> database;
+hash<string> myHash;
 const string salt = "myssaltfordemo";
 
-void store(string name, string pass)
+bool store(string name, string pass)
 {
-    auto id = myHash(pass + salt);
-    data1[name] = id;
+    if (database.find(name) != database.end())
+        return false;
+    auto hashId = myHash(pass + salt);
+    database[name] = hashId;
+    return true;
 }
 
 bool authenticate(string name, string pass)
 {
-    auto id = myHash(pass + salt);
-    auto val = data1.find(name);
-    if (val != data1.end())
-        return (val->second == id);
+    auto hashId = myHash(pass + salt);
+    auto user = database.find(name);
+    if (user != database.end())
+        return (user->second == hashId);
     return false;
 }
 
-int main()
+bool changePassword(string name, string currentPassword, string newPassword)
 {
-    int cnt;
-    string name, pass;
+    if (!authenticate(name, currentPassword))
+        return false;
+    auto hashId = myHash(newPassword + salt);
+    database[name] = hashId;
+    return true;
+}
+
+void run()
+{
+    int choice;
+    string username, password;
     while (true)
     {
-        cout << "\n\n1. signup\n2. login\n3. showDataBase\n\n";
-        cin >> cnt;
-        switch (cnt)
+        cout << "\n\n1. Signup\n2. Login\n3. Change Password\n4. Show DataBase\n\n";
+        cin >> choice;
+        switch (choice)
         {
         case 1:
         {
             cout << "Enter UserName and Password\n";
-            cin >> name >> pass;
-            store(name, pass);
-            cout << "Done\n";
+            cin >> username >> password;
+            if (store(username, password))
+                cout << "Signup Completed !\n";
+            else
+                cout << "UserName Already Present !\n";
             break;
         }
         case 2:
         {
             cout << "Enter UserName and Password\n";
-            cin >> name >> pass;
-            if (authenticate(name, pass))
+            cin >> username >> password;
+            if (authenticate(username, password))
             {
-                cout << "Correct UserName and Password\n";
+                cout << "Correct UserName and Password ... Login Successful !!!\n";
             }
             else
             {
-                cout << "Wrong UserName or Password\n";
+                cout << "Wrong UserName or Password ... Login Failed !!!\n";
             }
             break;
         }
         case 3:
         {
-            cout << "DATABASE : \n";
-            for (auto x : data1)
+            cout << "Enter UserName and Current Password\n";
+            cin >> username >> password;
+            cout << "Enter New Password\n";
+            string newPassword;
+            cin >> newPassword;
+            if (changePassword(username, password, newPassword))
+                cout << "Password Changed Successfully !!!\n";
+            else
+                cout << "UserName or Current Password is Entered Wrong !\n";
+            break;
+        }
+        case 4:
+        {
+            if (database.size() != 0)
             {
-                cout << x.first << " -> " << x.second << endl;
+                cout << "DATABASE : \n";
+                for (auto data : database)
+                {
+                    cout << data.first << " -> " << data.second << endl;
+                }
+                break;
             }
+            cout << "DATABASE Is Empty !\n";
             break;
         }
         default:
-            return 0;
+            return;
         }
     }
+}
+
+int main()
+{
+    cout << "\n\nWelcome to an Authentication Demo";
+    run();
+    cout << "\nThanks for Using the Program, Hope you Liked it.\n";
     return 0;
 }
 
@@ -92,7 +131,7 @@ server : {
 
 
 
-aman -> 123
+aman -> hashId
 
 
 16 16^16
