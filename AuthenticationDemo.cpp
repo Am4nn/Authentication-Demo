@@ -7,16 +7,17 @@ using namespace std;
 
 unordered_map<string, size_t> data1;
 std::hash<std::string> myHash;
+const string salt = "myssaltfordemo";
 
 void store(string name, string pass)
 {
-    auto id = myHash(pass);
+    auto id = myHash(pass + salt);
     data1[name] = id;
 }
 
 bool authenticate(string name, string pass)
 {
-    auto id = myHash(pass);
+    auto id = myHash(pass + salt);
     auto val = data1.find(name);
     if (val != data1.end())
         return (val->second == id);
