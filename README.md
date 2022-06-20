@@ -1,4 +1,12 @@
 # Authentication-Demo
-how login data is stored in database and how login details are checked
+A command line interface (cli) to show :
+> How login data is stored in database.
 
-used c++
+> How login details are checked.
+
+> How passwords are changed.
+
+> What happens while registering with an username which is already registered.
+
+<br>
+Made using C++
